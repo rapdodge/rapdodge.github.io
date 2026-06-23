@@ -478,6 +478,7 @@
           dateUtc: '',
           timeUtc: ''
         };
+        // Gabungkan date dan time menjadi objek Date lokal perangkat
         const dtLocal = new Date(`${dateStr}T${timeStr}:00`);
         if (isNaN(dtLocal.getTime())) return {
           dateLocal: '',
@@ -485,12 +486,19 @@
           dateUtc: '',
           timeUtc: ''
         };
-        const dtUtc = new Date(dtLocal.getTime() - (7 * 60 * 60 * 1000));
+        // Membuat objek Date terpisah khusus untuk membaca waktu UTC asli tanpa manipulasi milidetik manual
+        const dtUtc = new Date(dtLocal.getTime());
+        // Mengambil komponen tanggal UTC langsung menggunakan metode native bawaan .getUTC*
+        const utcDay = dtUtc.getUTCDate();
+        const utcMonth = monthNames[dtUtc.getUTCMonth()];
+        const utcYear = dtUtc.getUTCFullYear();
+        const utcHours = String(dtUtc.getUTCHours()).padStart(2, '0');
+        const utcMinutes = String(dtUtc.getUTCMinutes()).padStart(2, '0');
         return {
           dateLocal: formatDateString(dtLocal),
           timeLocal: timeStr + ' UTC+7',
-          dateUtc: formatDateString(dtUtc),
-          timeUtc: String(dtUtc.getUTCHours()).padStart(2, '0') + ':' + String(dtUtc.getUTCMinutes()).padStart(2, '0') + ' UTC'
+          dateUtc: `${utcDay} ${utcMonth} ${utcYear}`,
+          timeUtc: `${utcHours}:${utcMinutes} UTC`
         };
       }
 
