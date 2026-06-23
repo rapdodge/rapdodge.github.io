@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shortwave Reception Report Generator (Outlook Optimized)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -155,6 +156,10 @@
         background-color: #0056b3;
       }
 
+      .btn-image {
+        background-color: #ff9800;
+      }
+
       .btn-print {
         background-color: #28a745;
       }
@@ -176,6 +181,12 @@
         color: #333;
         padding: 20px;
         border: 1px solid #ddd;
+      }
+
+      #a4-image-target {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
       }
 
       @media print {
@@ -323,15 +334,18 @@
       <div class="btn-actions">
         <div class="action-row-main">
           <button class="action-btn btn-download" onclick="downloadHTML()">Download HTML</button>
-          <button class="action-btn btn-print" onclick="window.print()">Print / Save PDF</button>
+          <button class="action-btn btn-image" onclick="downloadImage()">Download JPG (A4)</button>
         </div>
-        <button class="action-btn btn-reset" onclick="resetForm()">Reset Form Data</button>
+        <div class="action-row-main">
+          <button class="action-btn btn-print" onclick="window.print()">Print / Save PDF</button>
+          <button class="action-btn btn-reset" onclick="resetForm()">Reset Form Data</button>
+        </div>
       </div>
     </div>
 
     <div class="preview-container">
       <div class="report-body" id="print-area">
-        <div style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-align: justify;">
+        <div id="a4-image-target" style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-align: justify; box-sizing: border-box;">
 
           <h1 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-top: 0; text-align: left;">Shortwave Radio Reception Report</h1>
 
@@ -452,8 +466,9 @@
           </div>
 
           <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
-          <p id="lbl_remarks" style="text-align: justify; margin-bottom: 10px; white-space: pre-line;"></p>
-          <ul id="lbl_yt_list" style="text-align: left; padding-left: 20px;"></ul>
+
+          <div id="lbl_remarks_container" style="margin-bottom: 15px; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;"></div>
+          <ul id="lbl_yt_list" style="text-align: left; padding-left: 20px; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;"></ul>
 
           <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px;">
             Thank you and 73! | Contact: <span id="lbl_contact"></span>
@@ -466,6 +481,12 @@
       const baseInputs = ['station', 'reporter', 'rx', 'ant', 'loc', 'grid', 'remarks', 'contact', 'input_date_local', 'input_time_local'];
       const singleVersionInputs = ['single_freq', 'single_mode', 'sinpo_s', 'sinpo_i', 'sinpo_n', 'sinpo_p', 'sinpo_o'];
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      // Setup default date to today
+      const today = new Date();
+      document.getElementById('input_date_local').value = today.toISOString().split('T')[0];
+      const hours = String(today.getHours()).padStart(2, '0');
+      const minutes = String(today.getMinutes()).padStart(2, '0');
+      document.getElementById('input_time_local').value = `${hours}:${minutes}`;
 
       function formatDateString(dateObj) {
         return `${dateObj.getDate()} ${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
@@ -555,11 +576,17 @@
         document.getElementById('lbl_single_time_local').innerText = mainTimeData.timeLocal || '-';
         document.getElementById('lbl_single_time_utc').innerText = mainTimeData.timeUtc || '-';
         baseInputs.forEach(id => {
-          if (id !== 'input_date_local' && id !== 'input_time_local') {
+          if (id !== 'input_date_local' && id !== 'input_time_local' && id !== 'remarks') {
             const val = document.getElementById(id).value;
             if (document.getElementById('lbl_' + id)) document.getElementById('lbl_' + id).innerText = val || '';
           }
         });
+        const rawRemarks = document.getElementById('remarks').value;
+        const liveRemarksHTML = rawRemarks.split('\n').map(para => {
+          if (para.trim() === '') return '';
+          return `<p style="text-align: justify; text-justify: inter-word; margin: 0 0 12px 0; font-family: Arial, sans-serif; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;">${para}</p>`;
+        }).join('');
+        document.getElementById('lbl_remarks_container').innerHTML = liveRemarksHTML;
         if (version === 'v1' || version === 'v2') {
           singleVersionInputs.forEach(id => {
             const val = document.getElementById(id).value;
@@ -674,21 +701,98 @@
           updatePreview();
         }
       }
-      baseInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
-      singleVersionInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
-      document.getElementById('yt_links').addEventListener('input', updatePreview);
-      toggleTemplateSections();
-      // GENERATE KODE HTML KHUSUS COMPATIBLE DENGAN OUTLOOK (INLINE TABLES)
+      // FITUR FIXED: GENERATE MULTI-PAGE GAMBAR BERDASARKAN RASIO TINGGI A4 (BOX-SIZING FIX)
+      function downloadImage() {
+        const sourceNode = document.getElementById('a4-image-target');
+        const dInput = document.getElementById('input_date_local').value;
+        const mainTimeData = processDateTimeConversion(dInput, '');
+        const filenameDate = mainTimeData.dateLocal ? mainTimeData.dateLocal.replace(/ /g, '_') : 'SW';
+        // 1. Buat kloningan offscreen tanpa batasan overflow agar kita tahu tinggi aslinya
+        const clonedNode = sourceNode.cloneNode(true);
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'fixed';
+        tempContainer.style.top = '-9999px';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.width = '800px';
+        tempContainer.style.height = 'auto';
+        tempContainer.style.backgroundColor = '#ffffff';
+        clonedNode.style.width = '100%';
+        clonedNode.style.boxShadow = 'none';
+        clonedNode.style.borderRadius = '0px';
+        clonedNode.style.margin = '0';
+        clonedNode.style.boxSizing = 'border-box'; // FIX: Pastikan padding internal masuk hitungan lebar awal
+        tempContainer.appendChild(clonedNode);
+        document.body.appendChild(tempContainer);
+        // Hitung tinggi riil dokumen & tentukan tinggi per halaman A4
+        const totalHeight = tempContainer.scrollHeight;
+        document.body.removeChild(tempContainer);
+        const pageHeightA4 = 1131; // Tinggi standar A4 jika lebarnya 800px
+        const totalPages = Math.ceil(totalHeight / pageHeightA4);
+        // Fungsi rekursif untuk me-render per halaman agar ter-trigger download berurutan dengan aman
+        function renderPage(pageIndex) {
+          if (pageIndex >= totalPages) return;
+          // Buat viewport pembungkus seukuran jendela A4 yang presisi
+          const frame = document.createElement('div');
+          frame.style.position = 'fixed';
+          frame.style.top = '-9999px';
+          frame.style.left = '-9999px';
+          frame.style.width = '800px';
+          frame.style.height = pageHeightA4 + 'px';
+          frame.style.overflow = 'hidden';
+          frame.style.backgroundColor = '#ffffff';
+          // Buat wrapper dalam untuk menggeser posisi koordinat elemen ke atas (efek kliping per page)
+          const innerWrapper = document.createElement('div');
+          innerWrapper.style.width = '800px';
+          innerWrapper.style.height = 'auto';
+          innerWrapper.style.position = 'relative';
+          innerWrapper.style.top = -(pageIndex * pageHeightA4) + 'px';
+          const pageClone = sourceNode.cloneNode(true);
+          pageClone.style.width = '100%';
+          pageClone.style.boxShadow = 'none';
+          pageClone.style.borderRadius = '0px';
+          pageClone.style.margin = '0';
+          pageClone.style.boxSizing = 'border-box'; // FIX: Batasi padding agar tidak menyebabkan horizontal overflow saat html2canvas bekerja
+          innerWrapper.appendChild(pageClone);
+          frame.appendChild(innerWrapper);
+          document.body.appendChild(frame);
+          html2canvas(frame, {
+            width: 800,
+            height: pageHeightA4,
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const link = document.createElement('a');
+            link.href = imgData;
+            // Menandai penamaan file per halaman (_page1, _page2, dst) jika lebih dari 1 halaman
+            const pageSuffix = totalPages > 1 ? `_page${pageIndex + 1}` : '';
+            link.download = `${filenameDate}_SW_Report${pageSuffix}.jpg`;
+            link.click();
+            document.body.removeChild(frame);
+            // Jeda sedikit waktu sebelum lanjut ambil page berikutnya agar browser tidak memblokir multiple download
+            setTimeout(() => {
+              renderPage(pageIndex + 1);
+            }, 400);
+          }).catch(err => {
+            if (document.body.contains(frame)) document.body.removeChild(frame);
+            alert('Gagal mengekspor halaman ' + (pageIndex + 1) + ': ' + err);
+          });
+        }
+        // Mulai ambil halaman pertama
+        renderPage(0);
+      }
+      // DOWNLOAD HTML OUTLOOK OPTIMIZED
       function downloadHTML() {
         const version = document.getElementById('template_version').value;
         const dInput = document.getElementById('input_date_local').value;
         const tInput = document.getElementById('input_time_local').value;
         const mainTimeData = processDateTimeConversion(dInput, tInput);
-        // Membagi teks remarks per baris (Enter), lalu dibungkus tag p justify mandiri
         const rawRemarks = document.getElementById('remarks').value;
         const formattedRemarks = rawRemarks.split('\n').map(para => {
-          if (para.trim() === '') return ''; // Abaikan baris kosong murni agar margin rapi
-          return `<p style="text-align: justify; text-justify: inter-word; margin: 0 0 12px 0; font-family: Arial, sans-serif;">${para}</p>`;
+          if (para.trim() === '') return '';
+          return `<p style="text-align: justify; text-justify: inter-word; margin: 0 0 12px 0; font-family: Arial, sans-serif; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;">${para}</p>`;
         }).join('');
         const data = {
           station: document.getElementById('station').value,
@@ -796,7 +900,7 @@
         document.getElementById('yt_links').value.split('\n').forEach(line => {
           if (line.trim() !== '') ytLiContent += `\n                <li>${line.trim()}</li>`;
         });
-        let ytUlContainer = ytLiContent ? `\n            <ul style="text-align: left; padding-left: 20px;">${ytLiContent}\n            </ul>` : '';
+        let ytUlContainer = ytLiContent ? `\n            <ul style="text-align: left; padding-left: 20px; word-wrap: break-word; word-break: break-word;">${ytLiContent}\n            </ul>` : '';
         const filenameDate = mainTimeData.dateLocal ? mainTimeData.dateLocal.replace(/ /g, '_') : 'SW';
         const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -805,7 +909,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Reception Report</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; text-align: justify;">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; text-align: justify; word-wrap: break-word; word-break: break-word;">
     <div style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
         <h1 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-top: 0; text-align: left;">Shortwave Radio Reception Report</h1>
         
@@ -843,7 +947,7 @@
                     <span style="font-weight: bold; color: #555;">Location:</span> ${data.loc || ''}
                 </td>
                 <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                    <span style="font-weight: bold; color: #555;">Coordinates/Grid:</span> ${data.grid || ''}
+                    <span style="font-weight: bold; color: #555;">Coordinates/Grid: ${data.grid || ''}</span>
                 </td>
             </tr>
         </table>
@@ -865,6 +969,10 @@
         link.download = `${filenameDate}_SW_Report.html`;
         link.click();
       }
+      baseInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+      singleVersionInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+      document.getElementById('yt_links').addEventListener('input', updatePreview);
+      toggleTemplateSections();
     </script>
   </body>
 
