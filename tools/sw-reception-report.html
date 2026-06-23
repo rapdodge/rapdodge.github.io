@@ -452,7 +452,7 @@
           </div>
 
           <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
-          <p id="lbl_remarks" style="text-align: justify; margin-bottom: 10px;"></p>
+          <p id="lbl_remarks" style="text-align: justify; margin-bottom: 10px; white-space: pre-line;"></p>
           <ul id="lbl_yt_list" style="text-align: left; padding-left: 20px;"></ul>
 
           <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px;">
@@ -478,7 +478,6 @@
           dateUtc: '',
           timeUtc: ''
         };
-        // Gabungkan date dan time menjadi objek Date lokal perangkat
         const dtLocal = new Date(`${dateStr}T${timeStr}:00`);
         if (isNaN(dtLocal.getTime())) return {
           dateLocal: '',
@@ -486,9 +485,7 @@
           dateUtc: '',
           timeUtc: ''
         };
-        // Membuat objek Date terpisah khusus untuk membaca waktu UTC asli tanpa manipulasi milidetik manual
         const dtUtc = new Date(dtLocal.getTime());
-        // Mengambil komponen tanggal UTC langsung menggunakan metode native bawaan .getUTC*
         const utcDay = dtUtc.getUTCDate();
         const utcMonth = monthNames[dtUtc.getUTCMonth()];
         const utcYear = dtUtc.getUTCFullYear();
@@ -687,6 +684,12 @@
         const dInput = document.getElementById('input_date_local').value;
         const tInput = document.getElementById('input_time_local').value;
         const mainTimeData = processDateTimeConversion(dInput, tInput);
+        // Membagi teks remarks per baris (Enter), lalu dibungkus tag p justify mandiri
+        const rawRemarks = document.getElementById('remarks').value;
+        const formattedRemarks = rawRemarks.split('\n').map(para => {
+          if (para.trim() === '') return ''; // Abaikan baris kosong murni agar margin rapi
+          return `<p style="text-align: justify; text-justify: inter-word; margin: 0 0 12px 0; font-family: Arial, sans-serif;">${para}</p>`;
+        }).join('');
         const data = {
           station: document.getElementById('station').value,
           reporter: document.getElementById('reporter').value,
@@ -694,7 +697,6 @@
           ant: document.getElementById('ant').value,
           loc: document.getElementById('loc').value,
           grid: document.getElementById('grid').value,
-          remarks: document.getElementById('remarks').value,
           contact: document.getElementById('contact').value
         };
         let coreReceptionHTML = '';
@@ -847,11 +849,11 @@
         </table>
         ${programDetailsBlock}
         <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
-        <p style="text-align: justify; margin-bottom: 10px; font-family: Arial, sans-serif;">${data.remarks || ''}</p>${ytUlContainer}
+        <div style="margin-bottom: 15px;">${formattedRemarks || ''}</div>${ytUlContainer}
         
         <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px; font-family: Arial, sans-serif;">
             Thank you and 73! | Contact: ${data.contact || ''}
-        </div>
+          </div>
     </div>
 </body>
 </html>`;
