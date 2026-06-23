@@ -1,931 +1,861 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Shortwave Reception Report Generator (Outlook Optimized)</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f0f2f5;
-                margin: 0;
-                padding: 20px;
-                display: flex;
-                gap: 20px;
-            }
 
-            .form-container {
-                flex: 1;
-                background: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                max-height: 94vh;
-                overflow-y: auto;
-            }
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shortwave Reception Report Generator (Outlook Optimized)</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+      }
 
-            .preview-container {
-                flex: 1.2;
-                background: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                max-height: 94vh;
-                overflow-y: auto;
-            }
+      .form-container {
+        flex: 1;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-height: 94vh;
+        overflow-y: auto;
+      }
 
-            h2.form-title {
-                margin-top: 0;
-                color: #333;
-                border-bottom: 2px solid #ccc;
-                padding-bottom: 5px;
-            }
+      .preview-container {
+        flex: 1.2;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-height: 94vh;
+        overflow-y: auto;
+      }
 
-            .form-group {
-                margin-bottom: 12px;
-            }
+      h2.form-title {
+        margin-top: 0;
+        color: #333;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 5px;
+      }
 
-            .form-group label {
-                display: block;
-                font-weight: bold;
-                margin-bottom: 5px;
-                color: #555;
-                font-size: 0.9em;
-            }
+      .form-group {
+        margin-bottom: 12px;
+      }
 
-            .form-group input,
-            .form-group select,
-            .form-group textarea {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                box-sizing: border-box;
-            }
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+        font-size: 0.9em;
+      }
 
-            .sinpo-grid {
-                display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                gap: 5px;
-            }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
 
-            .form-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 10px;
-            }
+      .sinpo-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+      }
 
-            .form-table th,
-            .form-table td {
-                padding: 4px;
-                text-align: center;
-            }
+      .form-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
 
-            .form-table input {
-                width: 100%;
-                padding: 6px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                text-align: center;
-                box-sizing: border-box;
-            }
+      .form-table th,
+      .form-table td {
+        padding: 4px;
+        text-align: center;
+      }
 
-            .program-row {
-                display: flex;
-                gap: 8px;
-                margin-bottom: 8px;
-            }
+      .form-table input {
+        width: 100%;
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: center;
+        box-sizing: border-box;
+      }
 
-            .program-row input[type="time"] {
-                flex: 0.3;
-            }
+      .program-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
 
-            .program-row input[type="text"].prog-desc {
-                flex: 1;
-            }
+      .program-row input[type="time"] {
+        flex: 0.3;
+      }
 
-            .btn-remove {
-                background-color: #e57373;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                padding: 6px 10px;
-                font-weight: bold;
-            }
+      .program-row input[type="text"].prog-desc {
+        flex: 1;
+      }
 
-            .btn-add,
-            .btn-add-prog {
-                background-color: #17a2b8;
-                color: white;
-                padding: 6px 12px;
-                font-size: 0.85em;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                margin-bottom: 15px;
-                font-weight: bold;
-            }
+      .btn-remove {
+        background-color: #e57373;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 6px 10px;
+        font-weight: bold;
+      }
 
-            .btn-actions {
-                margin-top: 20px;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
+      .btn-add,
+      .btn-add-prog {
+        background-color: #17a2b8;
+        color: white;
+        padding: 6px 12px;
+        font-size: 0.85em;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        font-weight: bold;
+      }
 
-            .action-row-main {
-                display: flex;
-                gap: 10px;
-            }
+      .btn-actions {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-            button.action-btn {
-                flex: 1;
-                padding: 12px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: bold;
-                color: white;
-                font-size: 1em;
-            }
+      .action-row-main {
+        display: flex;
+        gap: 10px;
+      }
 
-            .btn-download {
-                background-color: #0056b3;
-            }
+      button.action-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        color: white;
+        font-size: 1em;
+      }
 
-            .btn-print {
-                background-color: #28a745;
-            }
+      .btn-download {
+        background-color: #0056b3;
+      }
 
-            .btn-reset {
-                background-color: #d32f2f;
-                opacity: 0.9;
-            }
+      .btn-print {
+        background-color: #28a745;
+      }
 
-            .btn-reset:hover {
-                opacity: 1;
-            }
+      .btn-reset {
+        background-color: #d32f2f;
+        opacity: 0.9;
+      }
 
-            /* PREVIEW AREA STYLES */
-            .report-body {
-                font-family: Arial, sans-serif;
-                line-height: 1.6;
-                background-color: #f9f9f9;
-                color: #333;
-                padding: 20px;
-                border: 1px solid #ddd;
-            }
+      .btn-reset:hover {
+        opacity: 1;
+      }
 
-            @media print {
-                body {
-                    padding: 0;
-                    background: white;
-                }
+      /* PREVIEW AREA STYLES */
+      .report-body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f9f9f9;
+        color: #333;
+        padding: 20px;
+        border: 1px solid #ddd;
+      }
 
-                .form-container {
-                    display: none;
-                }
+      @media print {
+        body {
+          padding: 0;
+          background: white;
+        }
 
-                .preview-container {
-                    max-height: none;
-                    overflow: visible;
-                    box-shadow: none;
-                    padding: 0;
-                    width: 100%;
-                }
+        .form-container {
+          display: none;
+        }
 
-                .report-body {
-                    border: none;
-                    background: white;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="form-container">
-            <h2 class="form-title">SW Report Generator</h2>
-            <div class="form-group" style="background: #eef1f6; padding: 10px; border-radius: 6px;">
-                <label style="color: #0056b3;">Pilih Versi Template Laporan</label>
-                <select id="template_version" onchange="toggleTemplateSections()">
-                    <option value="v1">Version 1: Standard (1 Freq & SINPO)</option>
-                    <option value="v2">Version 2: Detailed (+ Program Details Log)</option>
-                    <option value="v3" selected>Version 3: Multi-Frequency (Banyak Freq & SINPO)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>To Station</label>
-                <input type="text" id="station" value="">
-            </div>
-            <div class="form-group">
-                <label>Report From</label>
-                <input type="text" id="reporter" value="">
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fffde7; padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #ffe082;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>Date (UTC+7)</label>
-                    <input type="date" id="input_date_local" value="">
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>Time (UTC+7)</label>
-                    <input type="time" id="input_time_local" value="">
-                </div>
-            </div>
-            <div id="form_single_reception_section">
-                <h3 style="font-size:0.95em; color:#444;">Reception Details</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="form-group">
-                        <label>Frequency</label>
-                        <input type="text" id="single_freq" value="">
-                    </div>
-                    <div class="form-group">
-                        <label>Mode</label>
-                        <input type="text" id="single_mode" value="">
-                    </div>
-                </div>
-                <h3 style="font-size:0.95em; color:#444;">Signal Quality (SINPO Rating)</h3>
-                <div class="sinpo-grid">
-                    <div class="form-group">
-                        <label>S</label>
-                        <input type="number" id="sinpo_s" min="1" max="5" value="">
-                    </div>
-                    <div class="form-group">
-                        <label>I</label>
-                        <input type="number" id="sinpo_i" min="1" max="5" value="">
-                    </div>
-                    <div class="form-group">
-                        <label>N</label>
-                        <input type="number" id="sinpo_n" min="1" max="5" value="">
-                    </div>
-                    <div class="form-group">
-                        <label>P</label>
-                        <input type="number" id="sinpo_p" min="1" max="5" value="">
-                    </div>
-                    <div class="form-group">
-                        <label>O</label>
-                        <input type="number" id="sinpo_o" min="1" max="5" value="">
-                    </div>
-                </div>
-            </div>
-            <div id="form_multi_reception_section">
-                <h3 style="font-size:0.95em; color:#444; margin-bottom: 5px;">Reception & SINPO Table (Multi-Input)</h3>
-                <table class="form-table">
-                    <thead>
-                        <tr style="font-size: 0.8em; color: #555;">
-                            <th style="width: 25%;">Time (UTC+7)</th>
-                            <th style="width: 25%;">Freq</th>
-                            <th style="width: 20%;">Mode</th>
-                            <th style="width: 5%;">S</th>
-                            <th style="width: 5%;">I</th>
-                            <th style="width: 5%;">N</th>
-                            <th style="width: 5%;">P</th>
-                            <th style="width: 5%;">O</th>
-                            <th style="width: 5%;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="multi-freq-container"></tbody>
-                </table>
-                <button class="btn-add" onclick="addMultiRow()">+ Tambah Baris Frekuensi/SINPO</button>
-            </div>
-            <h3 style="font-size:0.95em; color:#444;">Receiver & Antenna Setup</h3>
-            <div class="form-group">
-                <label>Receiver</label>
-                <input type="text" id="rx" value="">
-            </div>
-            <div class="form-group">
-                <label>Antenna</label>
-                <input type="text" id="ant" value="">
-            </div>
-            <div class="form-group">
-                <label>Location</label>
-                <input type="text" id="loc" value="">
-            </div>
-            <div class="form-group">
-                <label>Coordinates/Grid</label>
-                <input type="text" id="grid" value="">
-            </div>
-            <div id="form_program_section">
-                <h3 style="font-size:0.95em; color:#444; margin-bottom: 5px;">Program Details Log</h3>
-                <div id="program-logs-container"></div>
-                <button class="btn-add-prog" onclick="addProgramRow()">+ Tambah Baris Detail Program</button>
-            </div>
-            <h3 style="font-size:0.95em; color:#444;">Remarks & Contact</h3>
-            <div class="form-group">
-                <label>Remarks</label>
-                <textarea id="remarks" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-                <label>YouTube Links (Satu link per baris)</label>
-                <textarea id="yt_links" rows="2"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Contact Email</label>
-                <input type="text" id="contact" value="">
-            </div>
-            <div class="btn-actions">
-                <div class="action-row-main">
-                    <button class="action-btn btn-download" onclick="downloadHTML()">Download HTML</button>
-                    <button class="action-btn btn-print" onclick="window.print()">Print / Save PDF</button>
-                </div>
-                <button class="action-btn btn-reset" onclick="resetForm()">Reset Form Data</button>
-            </div>
+        .preview-container {
+          max-height: none;
+          overflow: visible;
+          box-shadow: none;
+          padding: 0;
+          width: 100%;
+        }
+
+        .report-body {
+          border: none;
+          background: white;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="form-container">
+      <h2 class="form-title">SW Report Generator</h2>
+
+      <div class="form-group" style="background: #eef1f6; padding: 10px; border-radius: 6px;">
+        <label style="color: #0056b3;">Pilih Versi Template Laporan</label>
+        <select id="template_version" onchange="toggleTemplateSections()">
+          <option value="v1">Version 1: Standard (1 Freq & SINPO)</option>
+          <option value="v2">Version 2: Detailed (+ Program Details Log)</option>
+          <option value="v3" selected>Version 3: Multi-Frequency (Banyak Freq & SINPO)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>To Station</label>
+        <input type="text" id="station" value="">
+      </div>
+      <div class="form-group">
+        <label>Report From</label>
+        <input type="text" id="reporter" value="">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fffde7; padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #ffe082;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Date (UTC+7)</label>
+          <input type="date" id="input_date_local" value="">
         </div>
-        <div class="preview-container">
-            <div class="report-body" id="print-area">
-                <div style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-align: justify;">
-                    <h1 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-top: 0; text-align: left;">Shortwave Radio Reception Report</h1>
-                    <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
-                        <tr>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">To Station:</span>
-                                <span id="lbl_station"></span>
-                            </td>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Report From:</span>
-                                <span id="lbl_reporter"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Date (UTC+7):</span>
-                                <span id="lbl_date_local"></span>
-                            </td>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Date (UTC):</span>
-                                <span id="lbl_date_utc" style="color: #0056b3; font-weight: bold;"></span>
-                            </td>
-                        </tr>
-                    </table>
-                    <div id="preview_single_reception_section">
-                        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception Details</h2>
-                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                            <thead>
-                                <tr style="background-color: #0056b3; color: white;">
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td id="lbl_single_time_local" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                    <td id="lbl_single_time_utc" style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;"></td>
-                                    <td id="lbl_single_freq" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                    <td id="lbl_single_mode" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Signal Quality (SINPO Rating)</h2>
-                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                            <thead>
-                                <tr style="background-color: #0056b3; color: white;">
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td id="lbl_s" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                    <td id="lbl_i" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                    <td id="lbl_n" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                    <td id="lbl_p" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                    <td id="lbl_o" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="preview_multi_reception_section">
-                        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception & Signal Quality Details</h2>
-                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                            <thead>
-                                <tr style="background-color: #0056b3; color: white;">
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lbl_multi_freq_tbody"></tbody>
-                        </table>
-                    </div>
-                    <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Receiver & Antenna Setup</h2>
-                    <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
-                        <tr>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Receiver:</span>
-                                <span id="lbl_rx"></span>
-                            </td>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Antenna:</span>
-                                <span id="lbl_ant"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Location:</span>
-                                <span id="lbl_loc"></span>
-                            </td>
-                            <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
-                                <span style="font-weight: bold; color: #555;">Coordinates/Grid:</span>
-                                <span id="lbl_grid"></span>
-                            </td>
-                        </tr>
-                    </table>
-                    <div id="preview_program_section">
-                        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Program Details (For Verification)</h2>
-                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                            <thead>
-                                <tr style="background-color: #0056b3; color: white;">
-                                    <th style="width: 20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
-                                    <th style="width: 20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
-                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Program Description</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lbl_program_details_tbody"></tbody>
-                        </table>
-                    </div>
-                    <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
-                    <p id="lbl_remarks" style="text-align: justify; margin-bottom: 10px;"></p>
-                    <ul id="lbl_yt_list" style="text-align: left; padding-left: 20px;"></ul>
-                    <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px;"> Thank you and 73! | Contact: <span id="lbl_contact"></span>
-                    </div>
-                </div>
-            </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Time (UTC+7)</label>
+          <input type="time" id="input_time_local" value="">
         </div>
-        <script>
-            const baseInputs = ['station', 'reporter', 'rx', 'ant', 'loc', 'grid', 'remarks', 'contact', 'input_date_local', 'input_time_local'];
-            const singleVersionInputs = ['single_freq', 'single_mode', 'sinpo_s', 'sinpo_i', 'sinpo_n', 'sinpo_p', 'sinpo_o'];
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      </div>
 
-            function formatDateString(dateObj) {
-                return `${dateObj.getDate()} ${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-            }
+      <div id="form_single_reception_section">
+        <h3 style="font-size:0.95em; color:#444;">Reception Details</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Frequency</label>
+            <input type="text" id="single_freq" value="">
+          </div>
+          <div class="form-group">
+            <label>Mode</label>
+            <input type="text" id="single_mode" value="">
+          </div>
+        </div>
 
-            function processDateTimeConversion(dateStr, timeStr) {
-                if (!dateStr || !timeStr) return {
-                    dateLocal: '',
-                    timeLocal: '',
-                    dateUtc: '',
-                    timeUtc: ''
-                };
-                const dtLocal = new Date(`${dateStr}T${timeStr}:00`);
-                if (isNaN(dtLocal.getTime())) return {
-                    dateLocal: '',
-                    timeLocal: '',
-                    dateUtc: '',
-                    timeUtc: ''
-                };
-                const dtUtc = new Date(dtLocal.getTime() - (7 * 60 * 60 * 1000));
-                return {
-                    dateLocal: formatDateString(dtLocal),
-                    timeLocal: timeStr + ' UTC+7',
-                    dateUtc: formatDateString(dtUtc),
-                    timeUtc: String(dtUtc.getUTCHours()).padStart(2, '0') + ':' + String(dtUtc.getUTCMinutes()).padStart(2, '0') + ' UTC'
-                };
-            }
+        <h3 style="font-size:0.95em; color:#444;">Signal Quality (SINPO Rating)</h3>
+        <div class="sinpo-grid">
+          <div class="form-group"><label>S</label><input type="number" id="sinpo_s" min="1" max="5" value=""></div>
+          <div class="form-group"><label>I</label><input type="number" id="sinpo_i" min="1" max="5" value=""></div>
+          <div class="form-group"><label>N</label><input type="number" id="sinpo_n" min="1" max="5" value=""></div>
+          <div class="form-group"><label>P</label><input type="number" id="sinpo_p" min="1" max="5" value=""></div>
+          <div class="form-group"><label>O</label><input type="number" id="sinpo_o" min="1" max="5" value=""></div>
+        </div>
+      </div>
 
-            function convertTableRowTime(timeStr) {
-                const baseDate = document.getElementById('input_date_local').value;
-                if (!baseDate || !timeStr) return {
-                    local: timeStr ? timeStr + ' UTC+7' : '',
-                    utc: ''
-                };
-                const res = processDateTimeConversion(baseDate, timeStr);
-                return {
-                    local: timeStr + ' UTC+7',
-                    utc: res.timeUtc
-                };
-            }
+      <div id="form_multi_reception_section">
+        <h3 style="font-size:0.95em; color:#444; margin-bottom: 5px;">Reception & SINPO Table (Multi-Input)</h3>
+        <table class="form-table">
+          <thead>
+            <tr style="font-size: 0.8em; color: #555;">
+              <th style="width: 25%;">Time (UTC+7)</th>
+              <th style="width: 25%;">Freq</th>
+              <th style="width: 20%;">Mode</th>
+              <th style="width: 5%;">S</th>
+              <th style="width: 5%;">I</th>
+              <th style="width: 5%;">N</th>
+              <th style="width: 5%;">P</th>
+              <th style="width: 5%;">O</th>
+              <th style="width: 5%;"></th>
+            </tr>
+          </thead>
+          <tbody id="multi-freq-container"></tbody>
+        </table>
+        <button class="btn-add" onclick="addMultiRow()">+ Tambah Baris Frekuensi/SINPO</button>
+      </div>
 
-            function toggleTemplateSections() {
-                const version = document.getElementById('template_version').value;
-                const formSingle = document.getElementById('form_single_reception_section');
-                const formMulti = document.getElementById('form_multi_reception_section');
-                const formProg = document.getElementById('form_program_section');
-                const prevSingle = document.getElementById('preview_single_reception_section');
-                const prevMulti = document.getElementById('preview_multi_reception_section');
-                const prevProg = document.getElementById('preview_program_section');
-                if (version === 'v1') {
-                    formSingle.style.display = 'block';
-                    prevSingle.style.display = 'block';
-                    formMulti.style.display = 'none';
-                    prevMulti.style.display = 'none';
-                    formProg.style.display = 'none';
-                    prevProg.style.display = 'none';
-                } else if (version === 'v2') {
-                    formSingle.style.display = 'block';
-                    prevSingle.style.display = 'block';
-                    formMulti.style.display = 'none';
-                    prevMulti.style.display = 'none';
-                    formProg.style.display = 'block';
-                    prevProg.style.display = 'block';
-                } else if (version === 'v3') {
-                    formSingle.style.display = 'none';
-                    prevSingle.style.display = 'none';
-                    formMulti.style.display = 'block';
-                    prevMulti.style.display = 'block';
-                    formProg.style.display = 'none';
-                    prevProg.style.display = 'none';
-                }
-                updatePreview();
-            }
+      <h3 style="font-size:0.95em; color:#444;">Receiver & Antenna Setup</h3>
+      <div class="form-group">
+        <label>Receiver</label>
+        <input type="text" id="rx" value="">
+      </div>
+      <div class="form-group">
+        <label>Antenna</label>
+        <input type="text" id="ant" value="">
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" id="loc" value="">
+      </div>
+      <div class="form-group">
+        <label>Coordinates/Grid</label>
+        <input type="text" id="grid" value="">
+      </div>
 
-            function updatePreview() {
-                const version = document.getElementById('template_version').value;
-                const dInput = document.getElementById('input_date_local').value;
-                const tInput = document.getElementById('input_time_local').value;
-                const mainTimeData = processDateTimeConversion(dInput, tInput);
-                document.getElementById('lbl_date_local').innerText = mainTimeData.dateLocal || '-';
-                document.getElementById('lbl_date_utc').innerText = mainTimeData.dateUtc || '-';
-                document.getElementById('lbl_single_time_local').innerText = mainTimeData.timeLocal || '-';
-                document.getElementById('lbl_single_time_utc').innerText = mainTimeData.timeUtc || '-';
-                baseInputs.forEach(id => {
-                    if (id !== 'input_date_local' && id !== 'input_time_local') {
-                        const val = document.getElementById(id).value;
-                        if (document.getElementById('lbl_' + id)) document.getElementById('lbl_' + id).innerText = val || '';
-                    }
-                });
-                if (version === 'v1' || version === 'v2') {
-                    singleVersionInputs.forEach(id => {
-                        const val = document.getElementById(id).value;
-                        if (id === 'sinpo_s') document.getElementById('lbl_s').innerText = val || '-';
-                        else if (id === 'sinpo_i') document.getElementById('lbl_i').innerText = val || '-';
-                        else if (id === 'sinpo_n') document.getElementById('lbl_n').innerText = val || '-';
-                        else if (id === 'sinpo_p') document.getElementById('lbl_p').innerText = val || '-';
-                        else if (id === 'sinpo_o') document.getElementById('lbl_o').innerText = val || '-';
-                        else if (document.getElementById('lbl_' + id)) document.getElementById('lbl_' + id).innerText = val || '';
-                    });
-                }
-                if (version === 'v3') {
-                    let tbodyHTML = '';
-                    const rows = document.querySelectorAll('#multi-freq-container tr');
-                    rows.forEach(row => {
-                        const localTimeVal = row.querySelector('.f-time-local').value;
-                        const timeConverted = convertTableRowTime(localTimeVal);
-                        tbodyHTML += `
-                                                                                    <tr>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${timeConverted.local || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${timeConverted.utc || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">
-                                                                                            <strong>${row.querySelector('.f-freq').value || '-'}</strong>
-                                                                                        </td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-mode').value || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-s').value || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-i').value || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-n').value || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-p').value || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">
-                                                                                            <strong>${row.querySelector('.f-o').value || '-'}</strong>
-                                                                                        </td>
-                                                                                    </tr>`;
-                    });
-                    document.getElementById('lbl_multi_freq_tbody').innerHTML = tbodyHTML || ' < tr > < td colspan = "9"
-                    style = "border: 1px solid #ddd; padding: 10px; text-align: center !important;" > < em > Tidak ada data frekuensi. < /em> < /td> < /tr>';
-                }
-                if (version === 'v2') {
-                    let programHTML = '';
-                    const pRows = document.querySelectorAll('.program-row');
-                    pRows.forEach(row => {
-                        const tLocalVal = row.querySelector('.prog-time-local').value;
-                        const d = row.querySelector('.prog-desc').value;
-                        const timeConverted = convertTableRowTime(tLocalVal);
-                        programHTML += `
-                                                                                    <tr>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${timeConverted.local || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${timeConverted.utc || '-'}</td>
-                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: left !important; padding-left:10px;">${d || ''}</td>
-                                                                                    </tr>`;
-                    });
-                    document.getElementById('lbl_program_details_tbody').innerHTML = programHTML || ' < tr > < td colspan = "3"
-                    style = "border: 1px solid #ddd; padding: 10px; text-align: center !important;" > < em > Tidak ada detail program. < /em> < /td> < /tr>';
-                }
-                const ytListContainer = document.getElementById('lbl_yt_list');
-                ytListContainer.innerHTML = '';
-                let hasLinks = false;
-                document.getElementById('yt_links').value.split('\n').forEach(line => {
-                    if (line.trim() !== '') {
-                        const li = document.createElement('li');
-                        li.innerText = line.trim();
-                        ytListContainer.appendChild(li);
-                        hasLinks = true;
-                    }
-                });
-                ytListContainer.style.display = hasLinks ? "block" : "none";
-            }
+      <div id="form_program_section">
+        <h3 style="font-size:0.95em; color:#444; margin-bottom: 5px;">Program Details Log</h3>
+        <div id="program-logs-container"></div>
+        <button class="btn-add-prog" onclick="addProgramRow()">+ Tambah Baris Detail Program</button>
+      </div>
 
-            function addMultiRow() {
-                const tbody = document.getElementById('multi-freq-container');
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                
-                                                                                    <td>
-                                                                                        <input type="time" class="f-time-local" value="">
-                                                                                        </td>
-                                                                                        <td>
-                                                                                            <input type="text" class="f-freq" placeholder="kHz">
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <input type="text" class="f-mode" placeholder="AM/SSB">
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    <input type="number" class="f-s" min="1" max="5">
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <input type="number" class="f-i" min="1" max="5">
-                                                                                                        </td>
-                                                                                                        <td>
-                                                                                                            <input type="number" class="f-n" min="1" max="5">
-                                                                                                            </td>
-                                                                                                            <td>
-                                                                                                                <input type="number" class="f-p" min="1" max="5">
-                                                                                                                </td>
-                                                                                                                <td>
-                                                                                                                    <input type="number" class="f-o" min="1" max="5">
-                                                                                                                    </td>
-                                                                                                                    <td>
-                                                                                                                        <button class="btn-remove" onclick="removeMultiRow(this)">X</button>
-                                                                                                                    </td>
+      <h3 style="font-size:0.95em; color:#444;">Remarks & Contact</h3>
+      <div class="form-group">
+        <label>Remarks</label>
+        <textarea id="remarks" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>YouTube Links (Satu link per baris)</label>
+        <textarea id="yt_links" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Contact Email</label>
+        <input type="text" id="contact" value="">
+      </div>
+
+      <div class="btn-actions">
+        <div class="action-row-main">
+          <button class="action-btn btn-download" onclick="downloadHTML()">Download HTML</button>
+          <button class="action-btn btn-print" onclick="window.print()">Print / Save PDF</button>
+        </div>
+        <button class="action-btn btn-reset" onclick="resetForm()">Reset Form Data</button>
+      </div>
+    </div>
+
+    <div class="preview-container">
+      <div class="report-body" id="print-area">
+        <div style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-align: justify;">
+
+          <h1 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-top: 0; text-align: left;">Shortwave Radio Reception Report</h1>
+
+          <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
+            <tr>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">To Station:</span> <span id="lbl_station"></span>
+              </td>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Report From:</span> <span id="lbl_reporter"></span>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Date (UTC+7):</span> <span id="lbl_date_local"></span>
+              </td>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Date (UTC):</span> <span id="lbl_date_utc" style="color: #0056b3; font-weight: bold;"></span>
+              </td>
+            </tr>
+          </table>
+
+          <div id="preview_single_reception_section">
+            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception Details</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="lbl_single_time_local" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                  <td id="lbl_single_time_utc" style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;"></td>
+                  <td id="lbl_single_freq" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                  <td id="lbl_single_mode" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                </tr>
+              </tbody>
+            </table>
+            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Signal Quality (SINPO Rating)</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="lbl_s" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                  <td id="lbl_i" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                  <td id="lbl_n" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                  <td id="lbl_p" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                  <td id="lbl_o" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="preview_multi_reception_section">
+            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception & Signal Quality Details</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
+                </tr>
+              </thead>
+              <tbody id="lbl_multi_freq_tbody"></tbody>
+            </table>
+          </div>
+
+          <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Receiver & Antenna Setup</h2>
+          <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
+            <tr>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Receiver:</span> <span id="lbl_rx"></span>
+              </td>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Antenna:</span> <span id="lbl_ant"></span>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Location:</span> <span id="lbl_loc"></span>
+              </td>
+              <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none;">
+                <span style="font-weight: bold; color: #555;">Coordinates/Grid:</span> <span id="lbl_grid"></span>
+              </td>
+            </tr>
+          </table>
+
+          <div id="preview_program_section">
+            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Program Details (For Verification)</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                  <th style="width: 20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
+                  <th style="width: 20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
+                  <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Program Description</th>
+                </tr>
+              </thead>
+              <tbody id="lbl_program_details_tbody"></tbody>
+            </table>
+          </div>
+
+          <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
+          <p id="lbl_remarks" style="text-align: justify; margin-bottom: 10px;"></p>
+          <ul id="lbl_yt_list" style="text-align: left; padding-left: 20px;"></ul>
+
+          <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px;">
+            Thank you and 73! | Contact: <span id="lbl_contact"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const baseInputs = ['station', 'reporter', 'rx', 'ant', 'loc', 'grid', 'remarks', 'contact', 'input_date_local', 'input_time_local'];
+      const singleVersionInputs = ['single_freq', 'single_mode', 'sinpo_s', 'sinpo_i', 'sinpo_n', 'sinpo_p', 'sinpo_o'];
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+      function formatDateString(dateObj) {
+        return `${dateObj.getDate()} ${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+      }
+
+      function processDateTimeConversion(dateStr, timeStr) {
+        if (!dateStr || !timeStr) return {
+          dateLocal: '',
+          timeLocal: '',
+          dateUtc: '',
+          timeUtc: ''
+        };
+        const dtLocal = new Date(`${dateStr}T${timeStr}:00`);
+        if (isNaN(dtLocal.getTime())) return {
+          dateLocal: '',
+          timeLocal: '',
+          dateUtc: '',
+          timeUtc: ''
+        };
+        const dtUtc = new Date(dtLocal.getTime() - (7 * 60 * 60 * 1000));
+        return {
+          dateLocal: formatDateString(dtLocal),
+          timeLocal: timeStr + ' UTC+7',
+          dateUtc: formatDateString(dtUtc),
+          timeUtc: String(dtUtc.getUTCHours()).padStart(2, '0') + ':' + String(dtUtc.getUTCMinutes()).padStart(2, '0') + ' UTC'
+        };
+      }
+
+      function convertTableRowTime(timeStr) {
+        const baseDate = document.getElementById('input_date_local').value;
+        if (!baseDate || !timeStr) return {
+          local: timeStr ? timeStr + ' UTC+7' : '',
+          utc: ''
+        };
+        const res = processDateTimeConversion(baseDate, timeStr);
+        return {
+          local: timeStr + ' UTC+7',
+          utc: res.timeUtc
+        };
+      }
+
+      function toggleTemplateSections() {
+        const version = document.getElementById('template_version').value;
+        const formSingle = document.getElementById('form_single_reception_section');
+        const formMulti = document.getElementById('form_multi_reception_section');
+        const formProg = document.getElementById('form_program_section');
+        const prevSingle = document.getElementById('preview_single_reception_section');
+        const prevMulti = document.getElementById('preview_multi_reception_section');
+        const prevProg = document.getElementById('preview_program_section');
+        if (version === 'v1') {
+          formSingle.style.display = 'block';
+          prevSingle.style.display = 'block';
+          formMulti.style.display = 'none';
+          prevMulti.style.display = 'none';
+          formProg.style.display = 'none';
+          prevProg.style.display = 'none';
+        } else if (version === 'v2') {
+          formSingle.style.display = 'block';
+          prevSingle.style.display = 'block';
+          formMulti.style.display = 'none';
+          prevMulti.style.display = 'none';
+          formProg.style.display = 'block';
+          prevProg.style.display = 'block';
+        } else if (version === 'v3') {
+          formSingle.style.display = 'none';
+          prevSingle.style.display = 'none';
+          formMulti.style.display = 'block';
+          prevMulti.style.display = 'block';
+          formProg.style.display = 'none';
+          prevProg.style.display = 'none';
+        }
+        updatePreview();
+      }
+
+      function updatePreview() {
+        const version = document.getElementById('template_version').value;
+        const dInput = document.getElementById('input_date_local').value;
+        const tInput = document.getElementById('input_time_local').value;
+        const mainTimeData = processDateTimeConversion(dInput, tInput);
+        document.getElementById('lbl_date_local').innerText = mainTimeData.dateLocal || '-';
+        document.getElementById('lbl_date_utc').innerText = mainTimeData.dateUtc || '-';
+        document.getElementById('lbl_single_time_local').innerText = mainTimeData.timeLocal || '-';
+        document.getElementById('lbl_single_time_utc').innerText = mainTimeData.timeUtc || '-';
+        baseInputs.forEach(id => {
+          if (id !== 'input_date_local' && id !== 'input_time_local') {
+            const val = document.getElementById(id).value;
+            if (document.getElementById('lbl_' + id)) document.getElementById('lbl_' + id).innerText = val || '';
+          }
+        });
+        if (version === 'v1' || version === 'v2') {
+          singleVersionInputs.forEach(id => {
+            const val = document.getElementById(id).value;
+            if (id === 'sinpo_s') document.getElementById('lbl_s').innerText = val || '-';
+            else if (id === 'sinpo_i') document.getElementById('lbl_i').innerText = val || '-';
+            else if (id === 'sinpo_n') document.getElementById('lbl_n').innerText = val || '-';
+            else if (id === 'sinpo_p') document.getElementById('lbl_p').innerText = val || '-';
+            else if (id === 'sinpo_o') document.getElementById('lbl_o').innerText = val || '-';
+            else if (document.getElementById('lbl_' + id)) document.getElementById('lbl_' + id).innerText = val || '';
+          });
+        }
+        if (version === 'v3') {
+          let tbodyHTML = '';
+          const rows = document.querySelectorAll('#multi-freq-container tr');
+          rows.forEach(row => {
+            const localTimeVal = row.querySelector('.f-time-local').value;
+            const timeConverted = convertTableRowTime(localTimeVal);
+            tbodyHTML += `<tr>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${timeConverted.local || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${timeConverted.utc || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"><strong>${row.querySelector('.f-freq').value || '-'}</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-mode').value || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-s').value || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-i').value || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-n').value || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-p').value || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"><strong>${row.querySelector('.f-o').value || '-'}</strong></td>
+                    </tr>`;
+          });
+          document.getElementById('lbl_multi_freq_tbody').innerHTML = tbodyHTML || '<tr><td colspan="9" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"><em>Tidak ada data frekuensi.</em></td></tr>';
+        }
+        if (version === 'v2') {
+          let programHTML = '';
+          const pRows = document.querySelectorAll('.program-row');
+          pRows.forEach(row => {
+            const tLocalVal = row.querySelector('.prog-time-local').value;
+            const d = row.querySelector('.prog-desc').value;
+            const timeConverted = convertTableRowTime(tLocalVal);
+            programHTML += `<tr>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${timeConverted.local || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${timeConverted.utc || '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: left !important; padding-left:10px;">${d || ''}</td>
+                    </tr>`;
+          });
+          document.getElementById('lbl_program_details_tbody').innerHTML = programHTML || '<tr><td colspan="3" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"><em>Tidak ada detail program.</em></td></tr>';
+        }
+        const ytListContainer = document.getElementById('lbl_yt_list');
+        ytListContainer.innerHTML = '';
+        let hasLinks = false;
+        document.getElementById('yt_links').value.split('\n').forEach(line => {
+          if (line.trim() !== '') {
+            const li = document.createElement('li');
+            li.innerText = line.trim();
+            ytListContainer.appendChild(li);
+            hasLinks = true;
+          }
+        });
+        ytListContainer.style.display = hasLinks ? "block" : "none";
+      }
+
+      function addMultiRow() {
+        const tbody = document.getElementById('multi-freq-container');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+                <td><input type="time" class="f-time-local" value=""></td>
+                <td><input type="text" class="f-freq" placeholder="kHz"></td>
+                <td><input type="text" class="f-mode" placeholder="AM/SSB"></td>
+                <td><input type="number" class="f-s" min="1" max="5"></td>
+                <td><input type="number" class="f-i" min="1" max="5"></td>
+                <td><input type="number" class="f-n" min="1" max="5"></td>
+                <td><input type="number" class="f-p" min="1" max="5"></td>
+                <td><input type="number" class="f-o" min="1" max="5"></td>
+                <td><button class="btn-remove" onclick="removeMultiRow(this)">X</button></td>
             `;
-                tbody.appendChild(tr);
-                tr.querySelectorAll('input').forEach(i => i.addEventListener('input', updatePreview));
-                updatePreview();
-            }
+        tbody.appendChild(tr);
+        tr.querySelectorAll('input').forEach(i => i.addEventListener('input', updatePreview));
+        updatePreview();
+      }
 
-            function removeMultiRow(button) {
-                button.parentElement.parentElement.remove();
-                updatePreview();
-            }
+      function removeMultiRow(button) {
+        button.parentElement.parentElement.remove();
+        updatePreview();
+      }
 
-            function addProgramRow() {
-                const container = document.getElementById('program-logs-container');
-                const div = document.createElement('div');
-                div.className = 'program-row';
-                div.innerHTML = `
-                
-                                                                                                                    <input type="time" class="prog-time-local" value="">
-                                                                                                                        <input type="text" class="prog-desc" placeholder="Program description...">
-                                                                                                                            <button class="btn-remove" onclick="removeProgramRow(this)">X</button>
+      function addProgramRow() {
+        const container = document.getElementById('program-logs-container');
+        const div = document.createElement('div');
+        div.className = 'program-row';
+        div.innerHTML = `
+                <input type="time" class="prog-time-local" value="">
+                <input type="text" class="prog-desc" placeholder="Program description...">
+                <button class="btn-remove" onclick="removeProgramRow(this)">X</button>
             `;
-                container.appendChild(div);
-                div.querySelector('.prog-time-local').addEventListener('input', updatePreview);
-                div.querySelector('.prog-desc').addEventListener('input', updatePreview);
-                updatePreview();
-            }
+        container.appendChild(div);
+        div.querySelector('.prog-time-local').addEventListener('input', updatePreview);
+        div.querySelector('.prog-desc').addEventListener('input', updatePreview);
+        updatePreview();
+      }
 
-            function removeProgramRow(button) {
-                button.parentElement.remove();
-                updatePreview();
-            }
+      function removeProgramRow(button) {
+        button.parentElement.remove();
+        updatePreview();
+      }
 
-            function resetForm() {
-                if (confirm("Apakah Anda yakin ingin menghapus seluruh data yang sudah diinput?")) {
-                    baseInputs.forEach(id => document.getElementById(id).value = '');
-                    singleVersionInputs.forEach(id => document.getElementById(id).value = '');
-                    document.getElementById('yt_links').value = '';
-                    document.getElementById('multi-freq-container').innerHTML = '';
-                    document.getElementById('program-logs-container').innerHTML = '';
-                    updatePreview();
-                }
-            }
-            baseInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
-            singleVersionInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
-            document.getElementById('yt_links').addEventListener('input', updatePreview);
-            toggleTemplateSections();
-            // GENERATE KODE HTML KHUSUS COMPATIBLE DENGAN OUTLOOK (INLINE TABLES)
-            function downloadHTML() {
-                const version = document.getElementById('template_version').value;
-                const dInput = document.getElementById('input_date_local').value;
-                const tInput = document.getElementById('input_time_local').value;
-                const mainTimeData = processDateTimeConversion(dInput, tInput);
-                const data = {
-                    station: document.getElementById('station').value,
-                    reporter: document.getElementById('reporter').value,
-                    rx: document.getElementById('rx').value,
-                    ant: document.getElementById('ant').value,
-                    loc: document.getElementById('loc').value,
-                    grid: document.getElementById('grid').value,
-                    remarks: document.getElementById('remarks').value,
-                    contact: document.getElementById('contact').value
-                };
-                let coreReceptionHTML = '';
-                if (version === 'v1' || version === 'v2') {
-                    coreReceptionHTML = `
+      function resetForm() {
+        if (confirm("Apakah Anda yakin ingin menghapus seluruh data yang sudah diinput?")) {
+          baseInputs.forEach(id => document.getElementById(id).value = '');
+          singleVersionInputs.forEach(id => document.getElementById(id).value = '');
+          document.getElementById('yt_links').value = '';
+          document.getElementById('multi-freq-container').innerHTML = '';
+          document.getElementById('program-logs-container').innerHTML = '';
+          updatePreview();
+        }
+      }
+      baseInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+      singleVersionInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+      document.getElementById('yt_links').addEventListener('input', updatePreview);
+      toggleTemplateSections();
+      // GENERATE KODE HTML KHUSUS COMPATIBLE DENGAN OUTLOOK (INLINE TABLES)
+      function downloadHTML() {
+        const version = document.getElementById('template_version').value;
+        const dInput = document.getElementById('input_date_local').value;
+        const tInput = document.getElementById('input_time_local').value;
+        const mainTimeData = processDateTimeConversion(dInput, tInput);
+        const data = {
+          station: document.getElementById('station').value,
+          reporter: document.getElementById('reporter').value,
+          rx: document.getElementById('rx').value,
+          ant: document.getElementById('ant').value,
+          loc: document.getElementById('loc').value,
+          grid: document.getElementById('grid').value,
+          remarks: document.getElementById('remarks').value,
+          contact: document.getElementById('contact').value
+        };
+        let coreReceptionHTML = '';
+        if (version === 'v1' || version === 'v2') {
+          coreReceptionHTML = `
+        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception Details</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${mainTimeData.timeLocal || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${mainTimeData.timeUtc || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('single_freq').value || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('single_mode').value || '-'}</td>
+                </tr>
+            </tbody>
+        </table>
+        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Signal Quality (SINPO Rating)</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_s').value || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_i').value || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_n').value || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_p').value || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_o').value || '-'}</td>
+                </tr>
+            </tbody>
+        </table>`;
+        } else if (version === 'v3') {
+          let rows = '';
+          document.querySelectorAll('#multi-freq-container tr').forEach(row => {
+            const lTime = row.querySelector('.f-time-local').value;
+            const tConv = convertTableRowTime(lTime);
+            rows += `\n                <tr><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${tConv.local || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${tConv.utc || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"><strong>${row.querySelector('.f-freq').value || '-'}</strong></td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-mode').value || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-s').value || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-i').value || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-n').value || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-p').value || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;"><strong>${row.querySelector('.f-o').value || '-'}</strong></td></tr>`;
+          });
+          coreReceptionHTML = `
+        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception & Signal Quality Details</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
+                </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="9" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">-</td></tr>'}
+            </tbody>
+        </table>`;
+        }
+        let programDetailsBlock = '';
+        if (version === 'v2') {
+          let tableRowsContent = '';
+          document.querySelectorAll('.program-row').forEach(row => {
+            const tL = row.querySelector('.prog-time-local').value;
+            const d = row.querySelector('.prog-desc').value;
+            const tConv = convertTableRowTime(tL);
+            tableRowsContent += `\n                <tr><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${tConv.local || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${tConv.utc || '-'}</td><td style="border: 1px solid #ddd; padding: 10px; text-align: left !important; padding-left:10px;">${d || ''}</td></tr>`;
+          });
+          programDetailsBlock = `
+        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Program Details (For Verification)</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <thead>
+                <tr style="background-color: #0056b3; color: white;">
+                    <th style="width:20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
+                    <th style="width:20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
+                    <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Program Description</th>
+                </tr>
+            </thead>
+            <tbody>${tableRowsContent || '<tr><td colspan="3" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">-</td></tr>'}
+            </tbody>
+        </table>`;
+        }
+        let ytLiContent = '';
+        document.getElementById('yt_links').value.split('\n').forEach(line => {
+          if (line.trim() !== '') ytLiContent += `\n                <li>${line.trim()}</li>`;
+        });
+        let ytUlContainer = ytLiContent ? `\n            <ul style="text-align: left; padding-left: 20px;">${ytLiContent}\n            </ul>` : '';
+        const filenameDate = mainTimeData.dateLocal ? mainTimeData.dateLocal.replace(/ /g, '_') : 'SW';
+        const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Reception Report</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; text-align: justify;">
+    <div style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+        <h1 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-top: 0; text-align: left;">Shortwave Radio Reception Report</h1>
         
-                                                                                                                            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception Details</h2>
-                                                                                                                            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                                                                                                                                <thead>
-                                                                                                                                    <tr style="background-color: #0056b3; color: white;">
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
-                                                                                                                                    </tr>
-                                                                                                                                </thead>
-                                                                                                                                <tbody>
-                                                                                                                                    <tr>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${mainTimeData.timeLocal || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${mainTimeData.timeUtc || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('single_freq').value || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('single_mode').value || '-'}</td>
-                                                                                                                                    </tr>
-                                                                                                                                </tbody>
-                                                                                                                            </table>
-                                                                                                                            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Signal Quality (SINPO Rating)</h2>
-                                                                                                                            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                                                                                                                                <thead>
-                                                                                                                                    <tr style="background-color: #0056b3; color: white;">
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
-                                                                                                                                    </tr>
-                                                                                                                                </thead>
-                                                                                                                                <tbody>
-                                                                                                                                    <tr>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_s').value || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_i').value || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_n').value || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_p').value || '-'}</td>
-                                                                                                                                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${document.getElementById('sinpo_o').value || '-'}</td>
-                                                                                                                                    </tr>
-                                                                                                                                </tbody>
-                                                                                                                            </table>`;
-                } else if (version === 'v3') {
-                    let rows = '';
-                    document.querySelectorAll('#multi-freq-container tr').forEach(row => {
-                        const lTime = row.querySelector('.f-time-local').value;
-                        const tConv = convertTableRowTime(lTime);
-                        rows += `\n                
-                                                                                                                            <tr>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${tConv.local || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${tConv.utc || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">
-                                                                                                                                    <strong>${row.querySelector('.f-freq').value || '-'}</strong>
-                                                                                                                                </td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-mode').value || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-s').value || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-i').value || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-n').value || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${row.querySelector('.f-p').value || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">
-                                                                                                                                    <strong>${row.querySelector('.f-o').value || '-'}</strong>
-                                                                                                                                </td>
-                                                                                                                            </tr>`;
-                    });
-                    coreReceptionHTML = `
-        
-                                                                                                                            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Reception & Signal Quality Details</h2>
-                                                                                                                            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                                                                                                                                <thead>
-                                                                                                                                    <tr style="background-color: #0056b3; color: white;">
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Frequency</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Mode</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">S</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">I</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">N</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">P</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">O</th>
-                                                                                                                                    </tr>
-                                                                                                                                </thead>
-                                                                                                                                <tbody>${rows || '
-                                                                                                                                    <tr>
-                                                                                                                                        <td colspan="9" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">-</td>
-                                                                                                                                    </tr>'}
-            
-                                                                                                                                </tbody>
-                                                                                                                            </table>`;
-                }
-                let programDetailsBlock = '';
-                if (version === 'v2') {
-                    let tableRowsContent = '';
-                    document.querySelectorAll('.program-row').forEach(row => {
-                        const tL = row.querySelector('.prog-time-local').value;
-                        const d = row.querySelector('.prog-desc').value;
-                        const tConv = convertTableRowTime(tL);
-                        tableRowsContent += `\n                
-                                                                                                                            <tr>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">${tConv.local || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center !important; color: #0056b3; font-weight: bold;">${tConv.utc || '-'}</td>
-                                                                                                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: left !important; padding-left:10px;">${d || ''}</td>
-                                                                                                                            </tr>`;
-                    });
-                    programDetailsBlock = `
-        
-                                                                                                                            <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Program Details (For Verification)</h2>
-                                                                                                                            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-                                                                                                                                <thead>
-                                                                                                                                    <tr style="background-color: #0056b3; color: white;">
-                                                                                                                                        <th style="width:20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC+7)</th>
-                                                                                                                                        <th style="width:20%; border: 1px solid #ddd; padding: 10px; text-align: center;">Time (UTC)</th>
-                                                                                                                                        <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Program Description</th>
-                                                                                                                                    </tr>
-                                                                                                                                </thead>
-                                                                                                                                <tbody>${tableRowsContent || '
-                                                                                                                                    <tr>
-                                                                                                                                        <td colspan="3" style="border: 1px solid #ddd; padding: 10px; text-align: center !important;">-</td>
-                                                                                                                                    </tr>'}
-            
-                                                                                                                                </tbody>
-                                                                                                                            </table>`;
-                }
-                let ytLiContent = '';
-                document.getElementById('yt_links').value.split('\n').forEach(line => {
-                    if (line.trim() !== '') ytLiContent += `\n                
-                                                                                                                            <li>${line.trim()}</li>`;
-                });
-                let ytUlContainer = ytLiContent ? `\n            
-                                                                                                                            <ul style="text-align: left; padding-left: 20px;">${ytLiContent}\n            </ul>` : '';
-                const filenameDate = mainTimeData.dateLocal ? mainTimeData.dateLocal.replace(/ /g, '_') : 'SW';
-                const htmlContent = `
-                                                                                                                            <!DOCTYPE html>
-                                                                                                                            <html lang="en">
-                                                                                                                                <head>
-                                                                                                                                    <meta charset="UTF-8">
-                                                                                                                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                                                                                                                            <title>Radio Reception Report</title>
-                                                                                                                                        </head>
-                                                                                                                                        <body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; text-align: justify;">
-                                                                                                                                            <div style="max-width: 800px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-                                                                                                                                                <h1 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-top: 0; text-align: left;">Shortwave Radio Reception Report</h1>
-                                                                                                                                                <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
-                                                                                                                                                    <tr>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">To Station:</span> ${data.station || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Report From:</span> ${data.reporter || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                    </tr>
-                                                                                                                                                    <tr>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Date (UTC+7):</span> ${mainTimeData.dateLocal || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Date (UTC):</span> ${mainTimeData.dateUtc || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                    </tr>
-                                                                                                                                                </table>
+        <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
+            <tr>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">To Station:</span> ${data.station || ''}
+                </td>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Report From:</span> ${data.reporter || ''}
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Date (UTC+7):</span> ${mainTimeData.dateLocal || ''}
+                </td>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Date (UTC):</span> ${mainTimeData.dateUtc || ''}
+                </td>
+            </tr>
+        </table>
         ${coreReceptionHTML}
-        
-                                                                                                                                                <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Receiver & Antenna Setup</h2>
-                                                                                                                                                <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
-                                                                                                                                                    <tr>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Receiver:</span> ${data.rx || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Antenna:</span> ${data.ant || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                    </tr>
-                                                                                                                                                    <tr>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Location:</span> ${data.loc || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                        <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
-                                                                                                                                                            <span style="font-weight: bold; color: #555;">Coordinates/Grid:</span> ${data.grid || ''}
-                
-                                                                                                                                                        </td>
-                                                                                                                                                    </tr>
-                                                                                                                                                </table>
+        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Receiver & Antenna Setup</h2>
+        <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;">
+            <tr>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Receiver:</span> ${data.rx || ''}
+                </td>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Antenna:</span> ${data.ant || ''}
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Location:</span> ${data.loc || ''}
+                </td>
+                <td style="width: 50%; text-align: left !important; padding: 4px 0; border: none; font-family: Arial, sans-serif;">
+                    <span style="font-weight: bold; color: #555;">Coordinates/Grid:</span> ${data.grid || ''}
+                </td>
+            </tr>
+        </table>
         ${programDetailsBlock}
+        <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
+        <p style="text-align: justify; margin-bottom: 10px; font-family: Arial, sans-serif;">${data.remarks || ''}</p>${ytUlContainer}
         
-                                                                                                                                                <h2 style="color: #333; font-size: 1.2em; margin-top: 20px; background: #f0f4f8; padding: 5px 10px; border-left: 4px solid #0056b3; text-align: left;">Remarks & Request</h2>
-                                                                                                                                                <p style="text-align: justify; margin-bottom: 10px; font-family: Arial, sans-serif;">${data.remarks || ''}</p>${ytUlContainer}
-        
-        
-                                                                                                                                                <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px; font-family: Arial, sans-serif;">
+        <div style="margin-top: 30px; text-align: center !important; font-size: 0.9em; color: #777; border-top: 1px solid #ddd; padding-top: 15px; font-family: Arial, sans-serif;">
             Thank you and 73! | Contact: ${data.contact || ''}
         </div>
-                                                                                                                                            </div>
-                                                                                                                                        </body>
-                                                                                                                                    </html>`;
-                const blob = new Blob([htmlContent], {
-                    type: 'text/html'
-                });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `${filenameDate}_SW_Report.html`;
-                link.click();
-            }
-        </script>
-    </body>
+    </div>
+</body>
+</html>`;
+        const blob = new Blob([htmlContent], {
+          type: 'text/html'
+        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${filenameDate}_SW_Report.html`;
+        link.click();
+      }
+    </script>
+  </body>
+
 </html>
